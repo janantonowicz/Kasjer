@@ -32,13 +32,14 @@ class ViewModel: ObservableObject {
     func updateArray() {
         safeArray = array.filter({ $0.nominal > 4 }).sorted(by: { $0.nominal > $1.nominal }).filter({ $0.count > 0 })
         minusSafe = sum
-        while minusSafe >= safe {
-            if minusSafe - (safeArray.first?.nominal ?? 0) > safe {
+        while minusSafe > safe {
+            if minusSafe - (safeArray.first?.nominal ?? 0) >= safe {
                 if safeArray.first?.count ?? 0 > 0 {
                     if let firstItem = safeArray.first {
                         safeArray.append(ItemModel(nominal: firstItem.nominal, count: firstItem.count - 1, id: firstItem.id, theValue: firstItem.theValue))
-                        safeArray = safeArray.filter({ $0.nominal > 4 }).sorted(by: { $0.nominal > $1.nominal }).filter({ $0.count > 0 })
                         minusSafe = minusSafe - firstItem.nominal
+                        safeArray.removeFirst()
+                        safeArray = safeArray.filter({ $0.nominal > 4 }).sorted(by: { $0.nominal > $1.nominal }).filter({ $0.count > 0 })
                     }
                 } else {
                     return
