@@ -200,47 +200,49 @@ extension MainView {
             .font(.system(size: 50))
             .fontWeight(.semibold)
             .frame(maxWidth: .infinity, minHeight: 70 , alignment: .bottomTrailing)
-            .frame(height: 100)
+            .frame(height: 70)
             .animation(.easeInOut, value: vm.sum == 0)
     }
     
     private var list: some View {
         ScrollView(showsIndicators: false) {
-            ForEach(vm.array.reversed()) { item in
-                ZStack {
+            VStack(spacing: 0) {
+                ForEach(vm.array.reversed()) { item in
                     ZStack {
-                        RoundedRectangle(cornerRadius: 30)
-                            .frame(height: 55)
-                        
-                        HStack {
-                            Text(item.nominal.asCurrencyWith2Decimals())
-                                .font(.title)
-                                .fontWeight(.semibold)
-                            Spacer()
-                            Text("\(item.theValue.asCurrencyWith2Decimals())")
-                                .font(.headline)
-                        }
-                        .foregroundColor(Color.white)
-                        .padding()
-                    }
-                    
-                    ZStack {
-                        Circle()
-                            .frame(height: 65)
-                            .foregroundColor(Color.white.opacity(0.4))
-                        
-                        Text("\(item.count)")
-                            .font(.title)
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 30)
+                                .frame(height: 55)
+                            
+                            HStack(spacing: 0) {
+                                Text(item.nominal.asCurrencyWith2Decimals())
+                                    .font(.title)
+                                    .fontWeight(.semibold)
+                                Spacer()
+                                Text("\(item.theValue.asCurrencyWith2Decimals())")
+                                    .font(.headline)
+                            }
                             .foregroundColor(Color.white)
+                            .padding(.horizontal)
+                        }
+                        
+                        ZStack {
+                            Circle()
+                                .frame(height: 65)
+                                .foregroundColor(Color.black)
+                            
+                            Text("\(item.count)")
+                                .font(.title)
+                                .foregroundColor(Color.white)
+                        }
                     }
+                    .frame(maxWidth: .infinity)
+                    .padding(.horizontal)
+                    .foregroundColor(item.count < 0 ? Color.red.opacity(0.3) : Color.blue.opacity(0.2))
+                    .cornerRadius(10)
                 }
-                .frame(maxWidth: .infinity)
-                .padding(.horizontal)
-                .foregroundColor(item.count < 0 ? Color.red.opacity(0.3) : Color.blue.opacity(0.2))
-                .cornerRadius(10)
             }
             Rectangle()
-                .frame(height: 55)
+                .frame(height: 70)
                 .opacity(0.0001)
         }
         .frame(maxHeight: UIScreen.main.bounds.height - 400)
