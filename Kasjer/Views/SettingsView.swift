@@ -29,7 +29,7 @@ struct SettingsView: View {
                     .keyboardType(.numberPad)
             }
             Button {
-                vm.safe = Double(textFieldPrice) ?? 500
+                vm.limit = Double(textFieldPrice) ?? 500
             } label: {
                 Text("Save")
                     .font(.headline)

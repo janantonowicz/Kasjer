@@ -19,8 +19,8 @@ struct MainView: View {
         ZStack(alignment: .bottom) {
             VStack {
                 suma
-                    .opacity(vm.sum >= vm.safe ? 1 : 0)
-                    .animation(.easeInOut, value: vm.sum >= vm.safe)
+                    .opacity(vm.sum >= vm.limit ? 1 : 0)
+                    .animation(.easeInOut, value: vm.sum >= vm.limit)
                 nominals
                 calculator
             }
@@ -28,7 +28,7 @@ struct MainView: View {
             
             VStack(alignment: .leading) {
                 navigation
-                ballance
+                calculations
                 list
                 Spacer()
             }
@@ -134,10 +134,10 @@ extension MainView {
                     if vm.selectedNominal == vm.array.first(where: { $0.nominal == vm.selectedNominal })?.nominal {
                         deleteID = vm.array.first(where: { $0.nominal == vm.selectedNominal })?.id ?? UUID()
                         if vm.plusMinus == false {
-                            vm.array.append(ItemModel(nominal: vm.selectedNominal, count: (vm.array.first(where: { $0.nominal == vm.selectedNominal })?.count ?? 0) + change, id: UUID(), theValue: vm.selectedNominal * (Double(vm.array.first(where: { $0.nominal == vm.selectedNominal })?.count ?? 0) + Double(change))))
+                            vm.array.append(ItemModel(nominal: vm.selectedNominal, count: (vm.array.first(where: { $0.nominal == vm.selectedNominal })?.count ?? 0) + Double(change), id: UUID(), theValue: vm.selectedNominal * (Double(vm.array.first(where: { $0.nominal == vm.selectedNominal })?.count ?? 0) + Double(change))))
                         } else if vm.plusMinus == true {
-                            if (vm.array.first(where: { $0.nominal == vm.selectedNominal })?.count ?? 0) - change > 0 {
-                                vm.array.append(ItemModel(nominal: vm.selectedNominal, count: (vm.array.first(where: { $0.nominal == vm.selectedNominal })?.count ?? 0) - change, id: UUID(), theValue: vm.selectedNominal * (Double(vm.array.first(where: { $0.nominal == vm.selectedNominal })?.count ?? 0) - Double(change))))
+                            if (vm.array.first(where: { $0.nominal == vm.selectedNominal })?.count ?? 0) - Double(change) > 0 {
+                                vm.array.append(ItemModel(nominal: vm.selectedNominal, count: (vm.array.first(where: { $0.nominal == vm.selectedNominal })?.count ?? 0) - Double(change), id: UUID(), theValue: vm.selectedNominal * (Double(vm.array.first(where: { $0.nominal == vm.selectedNominal })?.count ?? 0) - Double(change))))
                             } else {
                                 vm.array.removeAll(where: { $0.id == deleteID })
                             }
@@ -145,7 +145,7 @@ extension MainView {
                         vm.array.removeAll(where: { $0.id == deleteID })
                     } else if vm.selectedNominal == vm.values.first(where: { $0 == vm.selectedNominal }) {
                         if vm.plusMinus == false {
-                            vm.array.append(ItemModel(nominal: vm.selectedNominal, count: Int(change), id: UUID(), theValue: vm.selectedNominal * Double(change)))
+                            vm.array.append(ItemModel(nominal: vm.selectedNominal, count: Double(change), id: UUID(), theValue: vm.selectedNominal * Double(change)))
                         } else if vm.plusMinus == true {
                             return
                         }
@@ -183,6 +183,8 @@ extension MainView {
                     vm.sumItems()
                 }
             Spacer()
+            ballance
+            Spacer()
             Image(systemName: "gearshape.fill")
                 .font(.title)
                 .foregroundColor(Color.blue)
@@ -196,6 +198,14 @@ extension MainView {
     }
     
     private var ballance: some View {
+        Text(vm.sum == 0 ? "No money" : vm.sum.asCurrencyWith2Decimals())
+            .font(.largeTitle)
+            .fontWeight(.semibold)
+            .frame(maxWidth: .infinity, alignment: .center)
+            .animation(.easeInOut, value: vm.sum == 0)
+    }
+    
+    private var calculations: some View {
         Text(vm.sum == 0 ? "No money" : vm.sum.asCurrencyWith2Decimals())
             .font(.system(size: 50))
             .fontWeight(.semibold)
@@ -230,7 +240,7 @@ extension MainView {
                                 .frame(height: 65)
                                 .foregroundColor(Color.black)
                             
-                            Text("\(item.count)")
+                            Text("\(item.count.asInteger())")
                                 .font(.title)
                                 .foregroundColor(Color.white)
                         }

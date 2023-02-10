@@ -42,6 +42,15 @@ extension Double {
         return formatter
     }
     
+    private var integerFormatter: NumberFormatter {
+        let formatter = NumberFormatter()
+        formatter.usesGroupingSeparator = true
+        formatter.numberStyle = .none
+        formatter.minimumFractionDigits = 0
+        formatter.maximumFractionDigits = 0
+        return formatter
+    }
+    
     /// Converts a Double into a Currency as a String with 2 decimal places
     /// ```
     /// Convert 1234.56 to "$1,234.56"
@@ -59,5 +68,10 @@ extension Double {
     func asPercentage() -> String {
         let number = NSNumber(value: self)
         return percentageFormatter.string(from: number) ?? "0%"
+    }
+    
+    func asInteger() -> String {
+        let number = NSNumber(value: self)
+        return integerFormatter.string(from: number) ?? "0"
     }
 }

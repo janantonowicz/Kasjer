@@ -10,7 +10,7 @@ import SwiftUI
 
 struct ItemModel: Identifiable {
     var nominal: Double
-    var count: Int
+    var count: Double
 //    let color: Color
     let id: UUID
     let theValue: Double

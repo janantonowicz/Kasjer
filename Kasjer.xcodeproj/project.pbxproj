@@ -42,6 +42,40 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		83E0D0222996D44E00D88FF4 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				83E33A6128A45E39001C5C51 /* ItemModel.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		83E0D0232996D46200D88FF4 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				83E33A5928A423AD001C5C51 /* MainView.swift */,
+				83E33A6728A62F0D001C5C51 /* SafeView.swift */,
+				83E33A6528A57C70001C5C51 /* SettingsView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		83E0D0242996D46900D88FF4 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				83E33A6328A4FEE5001C5C51 /* ViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		83E0D0252996D48600D88FF4 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				83E33A5D28A44BF6001C5C51 /* Double.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
 		83E33A3F28A42396001C5C51 = {
 			isa = PBXGroup;
 			children = (
@@ -62,12 +96,10 @@
 			isa = PBXGroup;
 			children = (
 				83E33A4B28A42396001C5C51 /* KasjerApp.swift */,
-				83E33A5928A423AD001C5C51 /* MainView.swift */,
-				83E33A6328A4FEE5001C5C51 /* ViewModel.swift */,
-				83E33A6528A57C70001C5C51 /* SettingsView.swift */,
-				83E33A6728A62F0D001C5C51 /* SafeView.swift */,
-				83E33A6128A45E39001C5C51 /* ItemModel.swift */,
-				83E33A5D28A44BF6001C5C51 /* Double.swift */,
+				83E0D0222996D44E00D88FF4 /* Models */,
+				83E0D0232996D46200D88FF4 /* Views */,
+				83E0D0242996D46900D88FF4 /* ViewModels */,
+				83E0D0252996D48600D88FF4 /* Extensions */,
 				83E33A4F28A42397001C5C51 /* Assets.xcassets */,
 				83E33A5128A42397001C5C51 /* Preview Content */,
 			);
