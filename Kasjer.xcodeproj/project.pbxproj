@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		83E0D028299826BC00D88FF4 /* SafeDataModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83E0D027299826BC00D88FF4 /* SafeDataModifier.swift */; };
 		83E33A4C28A42396001C5C51 /* KasjerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83E33A4B28A42396001C5C51 /* KasjerApp.swift */; };
 		83E33A5028A42397001C5C51 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 83E33A4F28A42397001C5C51 /* Assets.xcassets */; };
 		83E33A5328A42397001C5C51 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 83E33A5228A42397001C5C51 /* Preview Assets.xcassets */; };
@@ -19,6 +20,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		83E0D027299826BC00D88FF4 /* SafeDataModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafeDataModifier.swift; sourceTree = "<group>"; };
 		83E33A4828A42396001C5C51 /* Kasjer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Kasjer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		83E33A4B28A42396001C5C51 /* KasjerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KasjerApp.swift; sourceTree = "<group>"; };
 		83E33A4F28A42397001C5C51 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -76,6 +78,14 @@
 			path = Extensions;
 			sourceTree = "<group>";
 		};
+		83E0D026299826A400D88FF4 /* Modifiers */ = {
+			isa = PBXGroup;
+			children = (
+				83E0D027299826BC00D88FF4 /* SafeDataModifier.swift */,
+			);
+			path = Modifiers;
+			sourceTree = "<group>";
+		};
 		83E33A3F28A42396001C5C51 = {
 			isa = PBXGroup;
 			children = (
@@ -96,6 +106,7 @@
 			isa = PBXGroup;
 			children = (
 				83E33A4B28A42396001C5C51 /* KasjerApp.swift */,
+				83E0D026299826A400D88FF4 /* Modifiers */,
 				83E0D0222996D44E00D88FF4 /* Models */,
 				83E0D0232996D46200D88FF4 /* Views */,
 				83E0D0242996D46900D88FF4 /* ViewModels */,
@@ -185,6 +196,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				83E33A4C28A42396001C5C51 /* KasjerApp.swift in Sources */,
+				83E0D028299826BC00D88FF4 /* SafeDataModifier.swift in Sources */,
 				83E33A6228A45E39001C5C51 /* ItemModel.swift in Sources */,
 				83E33A5E28A44BF6001C5C51 /* Double.swift in Sources */,
 				83E33A6628A57C70001C5C51 /* SettingsView.swift in Sources */,
@@ -322,6 +334,7 @@
 				DEVELOPMENT_TEAM = UQJGK438M6;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Kalkulator Kasy";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -351,6 +364,7 @@
 				DEVELOPMENT_TEAM = UQJGK438M6;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Kalkulator Kasy";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

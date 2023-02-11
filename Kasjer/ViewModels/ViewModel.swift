@@ -24,6 +24,7 @@ class ViewModel: ObservableObject {
     ]
         
     @Published var array: [ItemModel] = []
+    var pomArray: [ItemModel] = []
     @Published var safeInput: [ItemModel] = []
     
     // Pom values
@@ -35,8 +36,12 @@ class ViewModel: ObservableObject {
     }
     
     func calculateSafe() {
-        array = array.sorted(by: { $0.nominal > $1.nominal})
-        array.forEach { item in
+        pomArray = array.filter({ item in
+            item.nominal > 4
+        })
+        pomArray = pomArray.sorted(by: { $0.nominal > $1.nominal})
+        kasetka = sum
+        pomArray.forEach { item in
             pomNominal = item.nominal
             pomCount = item.count
             
@@ -48,20 +53,30 @@ class ViewModel: ObservableObject {
     }
     
     func calculateForNominal() {
-        if ((sum - (pomNominal*pomCount)) > limit) {
-             sum = (sum - (pomNominal*pomCount))
-            guard pomCount > 0 else { return }
-            safeInput.append(ItemModel(
-                nominal: pomNominal,
-                count: pomCount,
-                id: UUID(),
-                theValue: pomCount*pomNominal))
-            return
-        } else {
-            guard pomCount > 0 else { return }
+        guard pomCount > 0 else { return }
+        if ((kasetka - (pomNominal*pomCount)) < limit) {
             pomCount = (pomCount-1)
             calculateForNominal()
+        } else {
+            kasetka = (kasetka - (pomNominal*pomCount))
+           safeInput.append(ItemModel(
+               nominal: pomNominal,
+               count: pomCount,
+               id: UUID(),
+               theValue: pomCount*pomNominal))
+           return
         }
+    }
+    
+    func reset() {
+        selectedNominal = 0.0
+        sum = 0.0
+        kasetka = 0.0
+        array = []
+        safeInput = []
+        pomArray = []
+        pomNominal = 0.0
+        pomCount = 0.0
     }
 }
 

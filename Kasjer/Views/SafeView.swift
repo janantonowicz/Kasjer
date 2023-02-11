@@ -13,30 +13,80 @@ struct SafeView: View {
     @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
-        VStack {
-            Image(systemName: "xmark")
-                .onTapGesture {
-                    self.presentationMode.wrappedValue.dismiss()
+        ZStack(alignment: .top) {
+            VStack(spacing: 5) {
+                Image(systemName: "xmark.app.fill")
+                    .padding(.horizontal)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .font(.system(size: 50))
+                    .foregroundColor(.red)
+                    .onTapGesture {
+                        vm.reset()
+                        self.presentationMode.wrappedValue.dismiss()
+                    }
+
+                VStack {
+                    ZStack(alignment: .top) {
+                        VStack {
+                            HStack{
+                                Text("Minimalna wartość kasetki:")
+                                Spacer()
+                                Text("\(vm.limit.asCurrencyWith2Decimals())")
+                                    .fontWeight(.black)
+                                    .font(.title2)
+                            }
+                            .padding()
+                            .background(Color.blue)
+                            .withSafeDataModifier()
+                            
+                            HStack{
+                                Text("Cała gotówka:")
+                                Spacer()
+                                Text("\(vm.sum.asCurrencyWith2Decimals())")
+                                    .fontWeight(.black)
+                                    .font(.title2)
+                            }
+                            .padding()
+                            .background(.green)
+                            .withSafeDataModifier()
+                            
+                            HStack{
+                                Text("Do kasetki:")
+                                Spacer()
+                                Text("\(vm.kasetka.asCurrencyWith2Decimals())")
+                                    .fontWeight(.black)
+                                    .font(.title2)
+                            }
+                            .padding()
+                            .background(.pink)
+                            .withSafeDataModifier()
+
+                            HStack{
+                                Text("Do sejfu schowaj:")
+                                Spacer()
+                                Text("\((vm.sum - vm.kasetka).asCurrencyWith2Decimals())")
+                                    .fontWeight(.black)
+                                    .font(.title2)
+                            }
+                            .padding()
+                            .background(Color.cyan)
+                            .withSafeDataModifier()
+                        }
+                        ScrollView {
+                            VStack {
+                                putToSafeList
+                            }
+                            .background(Color.black)
+                            .cornerRadius(10)
+                            .padding(.top, 350)
+                        }
+                        
+                    }
+                    
                 }
-            Text("Minimalna wartość kasetki:  \(vm.limit.asCurrencyWith2Decimals())")
-                .font(.headline)
-                .frame(height: 55)
-                .frame(maxWidth: .infinity)
-                .background(Color.blue)
-                .cornerRadius(10)
-            
-            Text("Wszystkie pieniądze w kasetce: \(vm.sum.asCurrencyWith2Decimals())")
-            
-            Text("W kasetce zostanie: \(vm.kasetka.asCurrencyWith2Decimals())")
-            Text("Do sejfu schowaj: \((vm.sum - vm.kasetka).asCurrencyWith2Decimals())")
-            
-            VStack{
-                ForEach(vm.safeInput) { item in
-                    Text("\(item.nominal), \(item.count)")
-                }
+                .padding(.horizontal)
             }
         }
-        .padding(.horizontal)
         .onAppear {
             vm.calculateSafe()
         }
@@ -48,5 +98,43 @@ struct SafeView_Previews: PreviewProvider {
         SafeView()
             .environmentObject(ViewModel())
             .preferredColorScheme(.dark)
+    }
+}
+
+
+extension SafeView {
+    
+    private var putToSafeList: some View {
+        ForEach(vm.safeInput) { item in
+            ZStack {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 10)
+                        .frame(height: 55)
+                    
+                    HStack(spacing: 0) {
+                        Text(item.nominal.asCurrencyWith2Decimals())
+                            .font(.title)
+                            .fontWeight(.semibold)
+                            .foregroundColor(Color.black)
+                        Spacer()
+                        ZStack {
+                            Circle()
+                                .frame(height: 65)
+                                .foregroundColor(Color.black)
+                            
+                            Text("\(item.count.asInteger())")
+                                .font(.title)
+                                .foregroundColor(Color.white)
+                        }
+                    }
+                    .padding(.horizontal)
+                }
+                
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal)
+            .foregroundColor(item.count < 0 ? Color.red.opacity(0.3) : Color.blue)
+            .cornerRadius(10)
+        }
     }
 }

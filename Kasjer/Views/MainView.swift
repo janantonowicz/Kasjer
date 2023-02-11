@@ -15,6 +15,8 @@ struct MainView: View {
     @State var deleteID: UUID = UUID()
     @State var fullscreenCover: Bool = false
     
+    @State var pomCounter = 0.0
+    
     var body: some View {
         ZStack(alignment: .bottom) {
             VStack {
@@ -28,7 +30,24 @@ struct MainView: View {
             
             VStack(alignment: .leading) {
                 navigation
-                calculations
+                HStack {
+                    Button {
+                        guard vm.selectedNominal != 0.0 else { return }
+                        vm.array.append(ItemModel(
+                            nominal: vm.selectedNominal,
+                            count: pomCounter,
+                            id: UUID(),
+                            theValue: pomCounter*vm.selectedNominal))
+                        vm.sumItems()
+                    } label: {
+                        Image(systemName: "checkmark.seal.fill")
+                            .foregroundColor(.green)
+                            .font(.largeTitle)
+                    }
+                    .opacity(pomCounter > 0 ? 1 : 0)
+
+                    calculations
+                }
                 list
                 Spacer()
             }
@@ -71,19 +90,6 @@ extension MainView {
         .fullScreenCover(isPresented: $fullscreenCover, content: {
             SafeView()
         })
-        
-        //        HStack {
-        //            Text("Sum")
-        //                .font(.title)
-        //                .foregroundColor(Color.black)
-        //                .fontWeight(.bold)
-        //            Image(systemName: "arrow.forward")
-        //                .font(.title)
-        //                .foregroundColor(Color.black)
-        //        }
-        //        .frame(width: 135, height: 55)
-        //        .background(Color.white)
-        //        .cornerRadius(50)
         .frame(maxWidth:.infinity, alignment: .trailing)
         .padding(.bottom, 8)
         
@@ -100,6 +106,9 @@ extension MainView {
                         .background(vm.selectedNominal == value ? Color.blue : Color.white.opacity(0.2))
                         .cornerRadius(5)
                         .onTapGesture {
+                            if vm.selectedNominal != value {
+                                pomCounter = 0.0
+                            }
                             vm.selectedNominal = value
                         }
                 }
@@ -131,33 +140,41 @@ extension MainView {
                 }
                 .frame(maxWidth: 100)
                 .onTapGesture {
-                    if vm.selectedNominal == vm.array.first(where: { $0.nominal == vm.selectedNominal })?.nominal {
-                        deleteID = vm.array.first(where: { $0.nominal == vm.selectedNominal })?.id ?? UUID()
-                        if vm.plusMinus == false {
-                            vm.array.append(ItemModel(nominal: vm.selectedNominal, count: (vm.array.first(where: { $0.nominal == vm.selectedNominal })?.count ?? 0) + Double(change), id: UUID(), theValue: vm.selectedNominal * (Double(vm.array.first(where: { $0.nominal == vm.selectedNominal })?.count ?? 0) + Double(change))))
-                        } else if vm.plusMinus == true {
-                            if (vm.array.first(where: { $0.nominal == vm.selectedNominal })?.count ?? 0) - Double(change) > 0 {
-                                vm.array.append(ItemModel(nominal: vm.selectedNominal, count: (vm.array.first(where: { $0.nominal == vm.selectedNominal })?.count ?? 0) - Double(change), id: UUID(), theValue: vm.selectedNominal * (Double(vm.array.first(where: { $0.nominal == vm.selectedNominal })?.count ?? 0) - Double(change))))
-                            } else {
-                                vm.array.removeAll(where: { $0.id == deleteID })
-                            }
-                        }
-                        vm.array.removeAll(where: { $0.id == deleteID })
-                    } else if vm.selectedNominal == vm.values.first(where: { $0 == vm.selectedNominal }) {
-                        if vm.plusMinus == false {
-                            vm.array.append(ItemModel(nominal: vm.selectedNominal, count: Double(change), id: UUID(), theValue: vm.selectedNominal * Double(change)))
-                        } else if vm.plusMinus == true {
-                            return
-                        }
+                    if vm.plusMinus == false {
+                        pomCounter = pomCounter + Double(change)
+                    } else {
+                        pomCounter = pomCounter - Double(change)
+                        guard pomCounter > 0 else { return pomCounter = 0 }
                     }
-                    vm.sumItems()
-                    if vm.plusMinus == true {
-                        vm.plusMinus = false
-                    }
-                    calculatorTapped = change
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                        calculatorTapped = 0
-                    }
+                    /*
+//                    if vm.selectedNominal == vm.array.first(where: { $0.nominal == vm.selectedNominal })?.nominal {
+//                        deleteID = vm.array.first(where: { $0.nominal == vm.selectedNominal })?.id ?? UUID()
+//                        if vm.plusMinus == false {
+//                            vm.array.append(ItemModel(nominal: vm.selectedNominal, count: (vm.array.first(where: { $0.nominal == vm.selectedNominal })?.count ?? 0) + Double(change), id: UUID(), theValue: vm.selectedNominal * (Double(vm.array.first(where: { $0.nominal == vm.selectedNominal })?.count ?? 0) + Double(change))))
+//                        } else if vm.plusMinus == true {
+//                            if (vm.array.first(where: { $0.nominal == vm.selectedNominal })?.count ?? 0) - Double(change) > 0 {
+//                                vm.array.append(ItemModel(nominal: vm.selectedNominal, count: (vm.array.first(where: { $0.nominal == vm.selectedNominal })?.count ?? 0) - Double(change), id: UUID(), theValue: vm.selectedNominal * (Double(vm.array.first(where: { $0.nominal == vm.selectedNominal })?.count ?? 0) - Double(change))))
+//                            } else {
+//                                vm.array.removeAll(where: { $0.id == deleteID })
+//                            }
+//                        }
+//                        vm.array.removeAll(where: { $0.id == deleteID })
+//                    } else if vm.selectedNominal == vm.values.first(where: { $0 == vm.selectedNominal }) {
+//                        if vm.plusMinus == false {
+//                            vm.array.append(ItemModel(nominal: vm.selectedNominal, count: Double(change), id: UUID(), theValue: vm.selectedNominal * Double(change)))
+//                        } else if vm.plusMinus == true {
+//                            return
+//                        }
+//                    }
+//                    vm.sumItems()
+//                    if vm.plusMinus == true {
+//                        vm.plusMinus = false
+//                    }
+//                    calculatorTapped = change
+//                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+//                        calculatorTapped = 0
+//                    }
+                    */
                 }
             }
         }
@@ -179,8 +196,8 @@ extension MainView {
                 .font(.title)
                 .foregroundColor(Color.red)
                 .onTapGesture {
-                    vm.array = []
-                    vm.sumItems()
+                    vm.reset()
+                    pomCounter = 0.0
                 }
             Spacer()
             ballance
@@ -206,9 +223,15 @@ extension MainView {
     }
     
     private var calculations: some View {
-        Text(vm.sum == 0 ? "No money" : vm.sum.asCurrencyWith2Decimals())
+        HStack {
+            Spacer()
+            Text("\(pomCounter.asInteger())")
+                .fontWeight(.semibold)
+            Image(systemName: "xmark")
+            Text("\(vm.selectedNominal.asCurrencyWith2Decimals())")
+                .fontWeight(.semibold)
+        }
             .font(.system(size: 50))
-            .fontWeight(.semibold)
             .frame(maxWidth: .infinity, minHeight: 70 , alignment: .bottomTrailing)
             .frame(height: 70)
             .animation(.easeInOut, value: vm.sum == 0)
