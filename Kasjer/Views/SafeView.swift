@@ -25,6 +25,7 @@ struct SafeView: View {
                         self.presentationMode.wrappedValue.dismiss()
                     }
 
+
                 VStack {
                     ZStack(alignment: .top) {
                         VStack {
@@ -72,10 +73,12 @@ struct SafeView: View {
                             .background(Color.cyan)
                             .withSafeDataModifier()
                         }
-                        ScrollView {
+                        ScrollView(showsIndicators: false) {
                             VStack {
                                 putToSafeList
                             }
+                            .frame(minHeight: 300, alignment: .top)
+                            .padding(.top)
                             .background(Color.black)
                             .cornerRadius(10)
                             .padding(.top, 350)
@@ -127,7 +130,6 @@ extension SafeView {
                                 .foregroundColor(Color.white)
                         }
                     }
-                    .padding(.horizontal)
                 }
                 
             }

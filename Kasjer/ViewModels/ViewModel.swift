@@ -14,6 +14,8 @@ class ViewModel: ObservableObject {
     @Published var sum: Double = 0.0
     @Published var limit: Double = 500.0
     @Published var kasetka: Double = 0.0
+    @Published var indexOfValue: Int = 1
+
     
     let values: [Double] = [
         500, 200, 100, 50, 20, 10, 5, 2, 1, 0.5, 0.2, 0.1, 0.05, 0.02, 0.01,
@@ -77,6 +79,7 @@ class ViewModel: ObservableObject {
         pomArray = []
         pomNominal = 0.0
         pomCount = 0.0
+        indexOfValue = 0
     }
 }
 

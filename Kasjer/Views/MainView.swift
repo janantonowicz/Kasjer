@@ -39,6 +39,9 @@ struct MainView: View {
                             id: UUID(),
                             theValue: pomCounter*vm.selectedNominal))
                         vm.sumItems()
+                        pomCounter = 0.0
+                        vm.selectedNominal = vm.values[vm.indexOfValue+1]
+                        vm.indexOfValue += 1
                     } label: {
                         Image(systemName: "checkmark.seal.fill")
                             .foregroundColor(.green)
@@ -110,6 +113,12 @@ extension MainView {
                                 pomCounter = 0.0
                             }
                             vm.selectedNominal = value
+                            vm.plusMinus = false
+                            if let index = vm.values.firstIndex(where: { $0 == value }){
+                                vm.indexOfValue = index
+                            }
+                            print("\(vm.selectedNominal)")
+                            print("\(pomCounter)")
                         }
                 }
             }
@@ -145,36 +154,8 @@ extension MainView {
                     } else {
                         pomCounter = pomCounter - Double(change)
                         guard pomCounter > 0 else { return pomCounter = 0 }
+                        vm.plusMinus = false
                     }
-                    /*
-//                    if vm.selectedNominal == vm.array.first(where: { $0.nominal == vm.selectedNominal })?.nominal {
-//                        deleteID = vm.array.first(where: { $0.nominal == vm.selectedNominal })?.id ?? UUID()
-//                        if vm.plusMinus == false {
-//                            vm.array.append(ItemModel(nominal: vm.selectedNominal, count: (vm.array.first(where: { $0.nominal == vm.selectedNominal })?.count ?? 0) + Double(change), id: UUID(), theValue: vm.selectedNominal * (Double(vm.array.first(where: { $0.nominal == vm.selectedNominal })?.count ?? 0) + Double(change))))
-//                        } else if vm.plusMinus == true {
-//                            if (vm.array.first(where: { $0.nominal == vm.selectedNominal })?.count ?? 0) - Double(change) > 0 {
-//                                vm.array.append(ItemModel(nominal: vm.selectedNominal, count: (vm.array.first(where: { $0.nominal == vm.selectedNominal })?.count ?? 0) - Double(change), id: UUID(), theValue: vm.selectedNominal * (Double(vm.array.first(where: { $0.nominal == vm.selectedNominal })?.count ?? 0) - Double(change))))
-//                            } else {
-//                                vm.array.removeAll(where: { $0.id == deleteID })
-//                            }
-//                        }
-//                        vm.array.removeAll(where: { $0.id == deleteID })
-//                    } else if vm.selectedNominal == vm.values.first(where: { $0 == vm.selectedNominal }) {
-//                        if vm.plusMinus == false {
-//                            vm.array.append(ItemModel(nominal: vm.selectedNominal, count: Double(change), id: UUID(), theValue: vm.selectedNominal * Double(change)))
-//                        } else if vm.plusMinus == true {
-//                            return
-//                        }
-//                    }
-//                    vm.sumItems()
-//                    if vm.plusMinus == true {
-//                        vm.plusMinus = false
-//                    }
-//                    calculatorTapped = change
-//                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-//                        calculatorTapped = 0
-//                    }
-                    */
                 }
             }
         }
