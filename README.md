@@ -13,6 +13,9 @@ If it is required to leave 500 PLN in cashbox Kasjer app will try to get as clos
 - it will keep in the cashbox only ammount exceding the limit
 - it will try to keep the lowest nominals
 
+## Usage
+You can build this app yourself by cloning this repository to a machine with macos and build it using XCode. Supported for devices with iOS 15.5+
+
 ## Screenshots:
 1. List of nominals with quantity created from user input
 2. (2 and 3) Summary view showing how much to put to safebox and cashbox with list of nominals with quantity for each of them
@@ -23,3 +26,9 @@ If it is required to leave 500 PLN in cashbox Kasjer app will try to get as clos
 <img src="https://github.com/user-attachments/assets/34a9bad7-195f-4cfd-b465-67b953e8e96f" alt="drawing" width="200"/>
 <img src="https://github.com/user-attachments/assets/ba3840c7-bbbb-4bb6-821f-291515001e40" alt="drawing" width="200"/>
 <img src="https://github.com/user-attachments/assets/c9706485-09b1-4de8-a1e0-eac7a107e5fd" alt="drawing" width="200"/>
+
+
+# Demo
+
+https://github.com/user-attachments/assets/340123fe-a8a6-4cb5-b808-9e330e76495f
+
