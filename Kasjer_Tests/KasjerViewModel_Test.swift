@@ -9,8 +9,10 @@ import Testing
 
 struct KasjerViewModel_Test {
 
-    @Test func <#test function name#>() async throws {
+    @Test func test_KasjerViewModel_sum() async throws {
         // Write your test here and use APIs like `#expect(...)` to check expected conditions.
+        let sum = 0.0
+        
     }
 
 }

@@ -2,7 +2,7 @@
 //  MainView.swift
 //  Kasjer
 //
-//  Created by Woturios on 10/08/2022.
+//  Created by Jan Antonowicz on 10/08/2022.
 //
 
 import SwiftUI
@@ -10,49 +10,84 @@ import SwiftUI
 struct MainView: View {
     
     @EnvironmentObject private var vm: ViewModel
-    @State var isPresented: Bool = false
-    @State var calculatorTapped: Int = 0
-    @State var deleteID: UUID = UUID()
-    @State var fullscreenCover: Bool = false
+    @State var toggleMinus: Bool = false
     
-    @State var pomCounter = 0.0
+    // Sheets and Covers
+    @State var showFullScreenCover: Bool = false
+    @State var showSettingsCard: Bool = false
+
+    // Count of current nominals
+    @State var nominalCount: Int = 0
+    
+    // Starting with the highest nominal
+    @State var selectedNominal: Double = 500.0
+    
+    @AppStorage("show_tip") var showTip: Bool = true
+    
+    // Nominals
+    let nominals: [Double] = [
+        500, 200, 100, 50, 20, 10, 5, 2, 1, 0.5, 0.2, 0.1, 0.05, 0.02, 0.01,
+    ]
+    
+    let change: [Int] = [
+        10, 5, 2, 1
+    ]
     
     var body: some View {
         ZStack(alignment: .bottom) {
+            /// Calculator overlay is over everything else
+            /// Contains:
+            /// - horizontal nominal picker row
+            /// - calculator row
+            ///
             VStack {
-                suma
-                    .opacity(vm.sum >= vm.limit ? 1 : 0)
-                    .animation(.easeInOut, value: vm.sum >= vm.limit)
-                nominals
+                /// enables user to select which nominal to edit
+                nominalPickerView
+                /// enables user to add or substract from current nominal quantity
                 calculator
+                /// button row with button for applying changes and calculating summary
+                buttonRow
             }
+            .background(Color.black)
             .zIndex(999)
             
             VStack(alignment: .leading) {
                 navigation
                 HStack {
                     Button {
-                        guard vm.selectedNominal != 0.0 else { return }
-                        vm.array.append(ItemModel(
-                            nominal: vm.selectedNominal,
-                            count: pomCounter,
-                            id: UUID(),
-                            theValue: pomCounter*vm.selectedNominal))
-                        vm.sumItems()
-                        pomCounter = 0.0
-                        vm.selectedNominal = vm.values[vm.indexOfValue+1]
-                        vm.indexOfValue += 1
+                        nominalCount = 0
                     } label: {
-                        Image(systemName: "checkmark.seal.fill")
-                            .foregroundColor(.green)
-                            .font(.largeTitle)
+                        Text("Clear")
+                            .foregroundStyle(.black)
+                            .padding()
+                            .background(
+                                RoundedRectangle(cornerRadius: 20)
+                                    .foregroundStyle(Color.red)
+                            )
                     }
-                    .opacity(pomCounter > 0 ? 1 : 0)
-
                     calculations
                 }
-                list
-                Spacer()
+                
+                ScrollView {
+                    ListView(array: vm.records)
+                    Spacer()
+                }
+                .overlay {
+                    VStack {
+                        Button {
+                            showTip.toggle()
+                        } label: {
+                            Image(systemName: "xmark")
+                        }
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                        ScrollView {
+                            TipView()
+                        }
+                    }
+                    .background(Color.black)
+                    .foregroundStyle(Color.white)
+                    .opacity(showTip ? 1 : 0)
+                }
             }
             .padding(.horizontal)
         }
@@ -68,93 +103,129 @@ struct MainView_Previews: PreviewProvider {
 }
 
 extension MainView {
-    private var suma: some View {
-        ZStack {
-            Color.orange
-                .frame(width: 140, height: 60)
-                .cornerRadius(50)
-            
-            HStack {
-                Text("Sum")
-                    .font(.title)
-                    .foregroundColor(Color.orange)
-                    .fontWeight(.bold)
-                Image(systemName: "arrow.forward")
-                    .font(.title)
-                    .foregroundColor(Color.orange)
+    
+    private var buttonRow: some View {
+        HStack {
+            Button {
+                if (nominalCount >= 0) {
+                    vm.saveAndUpdate(nominalCount: nominalCount, selectedNominal: selectedNominal)
+                    if (vm.indexOfValue < nominals.count) {
+                        selectedNominal = nominals[vm.indexOfValue]
+                    }
+                    nominalCount = vm.nominalChange(nominal: selectedNominal)
+                }
+            } label: {
+                Text("Apply")
+                    .foregroundStyle(.black)
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(
+                        RoundedRectangle(cornerRadius: 20)
+                            .foregroundStyle(Color.orange)
+                    )
+                    .opacity(nominalCount < 0 ? 0.7 : 1)
             }
-            .frame(width: 135, height: 55)
-            .background(Color.black)
-            .cornerRadius(50)
+            .disabled(nominalCount < 0)
+            
+            Button {
+                if (vm.sum >= vm.limit) {
+                    showFullScreenCover.toggle()
+                }
+            } label: {
+                Text("Sum")
+                    .foregroundStyle(.black)
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(
+                        RoundedRectangle(cornerRadius: 20)
+                            .foregroundStyle(Color.yellow)
+                            .opacity(vm.sum < vm.limit ? 0.4 : 1)
+                    )
+            }
+            .disabled(vm.sum < vm.limit)
+            .fullScreenCover(isPresented: $showFullScreenCover, content: {
+                SafeView()
+            })
+            .animation(.easeInOut, value: vm.sum >= vm.limit)
+            .opacity(vm.sum < vm.limit ? 0.7 : 1)
+
         }
-        .onTapGesture {
-            fullscreenCover.toggle()
-        }
-        .fullScreenCover(isPresented: $fullscreenCover, content: {
-            SafeView()
-        })
-        .frame(maxWidth:.infinity, alignment: .trailing)
-        .padding(.bottom, 8)
-        
+        .padding()
     }
     
-    private var nominals: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack {
-                ForEach(vm.values, id: \.self) { value in
-                    Text(value.asCurrencyWith2Decimals())
-                        .font(.title)
-                        .fontWeight(.semibold)
-                        .frame(width: 120, height: 80)
-                        .background(vm.selectedNominal == value ? Color.blue : Color.white.opacity(0.2))
-                        .cornerRadius(5)
-                        .onTapGesture {
-                            if vm.selectedNominal != value {
-                                pomCounter = 0.0
+    /// This view shows horizontal scroll view with nominals to pick from
+    private var nominalPickerView: some View {
+        ScrollViewReader { scrollProxy in
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack {
+                    ForEach(nominals, id: \.self) { value in
+                        Text(value.asCurrencyWith2Decimals())
+                            // Each value must have a unique id for scrolling.
+                            .id(value)
+                            .font(.title2)
+                            .font(.footnote.weight(.semibold))
+                            .padding(15)
+                            .background(selectedNominal == value ? Color.blue : Color.white.opacity(0.2))
+                            .cornerRadius(5)
+                            .onTapGesture {
+                                nominalCount = vm.nominalChange(nominal: value)
+                                selectedNominal = value
+                                toggleMinus = false
+                                if let index = nominals.firstIndex(where: { $0 == value }){
+                                    vm.indexOfValue = index
+                                }
+                                // Animate scrolling to the tapped element.
+                                withAnimation {
+                                    scrollProxy.scrollTo(value, anchor: .center)
+                                }
+                                print("\(selectedNominal)")
+                                print("\(nominalCount)")
                             }
-                            vm.selectedNominal = value
-                            vm.plusMinus = false
-                            if let index = vm.values.firstIndex(where: { $0 == value }){
-                                vm.indexOfValue = index
-                            }
-                            print("\(vm.selectedNominal)")
-                            print("\(pomCounter)")
-                        }
+                    }
+                }
+            }
+            // Optional: scroll automatically if selectedNominal changes externally.
+            .onChange(of: selectedNominal) { newValue in
+                withAnimation {
+                    scrollProxy.scrollTo(newValue, anchor: .center)
                 }
             }
         }
     }
-    
+
+    /// This view shows calculator ui including:
+    /// - plus / minus toggle button
+    /// - buttons with quantity user can add or subtract from the total count of currently selected nominal
     private var calculator: some View {
         HStack {
             ZStack {
                 Circle()
-                    .foregroundColor(vm.plusMinus ? Color.red : Color.orange)
+                    .foregroundColor(toggleMinus ? Color.red : Color.orange)
                 
-                Image(systemName: vm.plusMinus ? "minus" : "plus")
+                Image(systemName: toggleMinus ? "minus" : "plus")
                     .font(.largeTitle)
             }
             .onTapGesture {
-                vm.plusMinus.toggle()
+                toggleMinus.toggle()
             }
-            .animation(.easeOut, value: vm.plusMinus)
+            .animation(.easeOut, value: toggleMinus)
             
-            ForEach(vm.change, id: \.self) { change in
+            ForEach(change, id: \.self) { change in
                 ZStack {
                     Circle()
-                        .foregroundColor(calculatorTapped == change ?  Color.red : Color.gray)
+                        .foregroundColor(Color.gray)
                     
                     Text("\(change)")
                         .font(.largeTitle)
                 }
                 .frame(maxWidth: 100)
                 .onTapGesture {
-                    if vm.plusMinus == false {
-                        pomCounter = pomCounter + Double(change)
+                    if toggleMinus == false {
+                        nominalCount = nominalCount + change
                     } else {
-                        pomCounter = pomCounter - Double(change)
-                        guard pomCounter > 0 else { return pomCounter = 0 }
-                        vm.plusMinus = false
+                        nominalCount = nominalCount - change
+                        toggleMinus = false
+                        guard nominalCount > 0 else { return nominalCount = 0 }
                     }
                 }
             }
@@ -171,25 +242,29 @@ extension Sequence  {
 }
 
 extension MainView {
+    /// This view shows navigation bar with:
+    /// - clear button to reset the calculator to initial values
+    /// - sum of all money
+    /// - settings button
     private var navigation: some View {
         HStack {
             Image(systemName: "xmark.bin.fill")
-                .font(.title)
+                .font(.title2)
                 .foregroundColor(Color.red)
                 .onTapGesture {
                     vm.reset()
-                    pomCounter = 0.0
+                    nominalCount = 0
                 }
             Spacer()
             ballance
             Spacer()
             Image(systemName: "gearshape.fill")
-                .font(.title)
+                .font(.title2)
                 .foregroundColor(Color.blue)
                 .onTapGesture {
-                    isPresented.toggle()
+                    showSettingsCard.toggle()
                 }
-                .sheet(isPresented: $isPresented) {
+                .sheet(isPresented: $showSettingsCard) {
                     SettingsView()
                 }
         }
@@ -197,7 +272,7 @@ extension MainView {
     
     private var ballance: some View {
         Text(vm.sum == 0 ? "No money" : vm.sum.asCurrencyWith2Decimals())
-            .font(.largeTitle)
+            .font(.title2)
             .fontWeight(.semibold)
             .frame(maxWidth: .infinity, alignment: .center)
             .animation(.easeInOut, value: vm.sum == 0)
@@ -206,59 +281,53 @@ extension MainView {
     private var calculations: some View {
         HStack {
             Spacer()
-            Text("\(pomCounter.asInteger())")
-                .fontWeight(.semibold)
+            Text("\(nominalCount)")
+                .font(.largeTitle)
+                .font(.footnote.weight(.semibold))
+            
             Image(systemName: "xmark")
-            Text("\(vm.selectedNominal.asCurrencyWith2Decimals())")
+                .font(.body)
+                .font(.footnote.weight(.semibold))
+            Text("\(selectedNominal.asCurrencyWith2Decimals())")
                 .fontWeight(.semibold)
+                .font(.largeTitle)
         }
-            .font(.system(size: 50))
-            .frame(maxWidth: .infinity, minHeight: 70 , alignment: .bottomTrailing)
-            .frame(height: 70)
+            .frame(maxWidth: .infinity, alignment: .bottomTrailing)
             .animation(.easeInOut, value: vm.sum == 0)
+            .padding(.vertical, 20)
     }
     
     private var list: some View {
-        ScrollView(showsIndicators: false) {
-            VStack(spacing: 0) {
-                ForEach(vm.array.reversed()) { item in
-                    ZStack {
-                        ZStack {
-                            RoundedRectangle(cornerRadius: 30)
-                                .frame(height: 55)
-                            
-                            HStack(spacing: 0) {
-                                Text(item.nominal.asCurrencyWith2Decimals())
-                                    .font(.title)
-                                    .fontWeight(.semibold)
-                                Spacer()
-                                Text("\(item.theValue.asCurrencyWith2Decimals())")
-                                    .font(.headline)
-                            }
-                            .foregroundColor(Color.white)
-                            .padding(.horizontal)
-                        }
-                        
-                        ZStack {
-                            Circle()
-                                .frame(height: 65)
-                                .foregroundColor(Color.black)
-                            
-                            Text("\(item.count.asInteger())")
-                                .font(.title)
-                                .foregroundColor(Color.white)
+        // header
+        VStack {
+            HStack {
+                Text("nominal:")
+                    .font(.callout)
+                    .frame(maxWidth: .infinity)
+                    .font(.footnote.weight(.semibold))
+                Text("count:")
+                    .font(.callout)
+                    .frame(maxWidth: .infinity)
+                    .font(.footnote.weight(.semibold))
+            }
+            
+            Divider()
+                .background(Color.gray)
+            
+            List {
+                ForEach(vm.records, id: \.self) { item in
+                    if item.count > 0 {
+                        HStack {
+                            Text(item.nominal.asCurrencyWith2Decimals())
+                                .frame(maxWidth: .infinity)
+                            Text("\(item.count)")
+                                .frame(maxWidth: .infinity)
                         }
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding(.horizontal)
-                    .foregroundColor(item.count < 0 ? Color.red.opacity(0.3) : Color.blue.opacity(0.2))
-                    .cornerRadius(10)
                 }
             }
-            Rectangle()
-                .frame(height: 70)
-                .opacity(0.0001)
+            .listStyle(.plain)
         }
-        .frame(maxHeight: UIScreen.main.bounds.height - 400)
+        
     }
 }

@@ -2,18 +2,15 @@
 //  ItemModel.swift
 //  Kasjer
 //
-//  Created by Woturios on 10/08/2022.
+//  Created by Jan Antonowicz on 10/08/2022.
 //
 
 import Foundation
 import SwiftUI
 
 /// Model for current calculation data
-/// Every
-struct RecordModel: Identifiable {
+/// Every record has nominal and count
+struct RecordModel: Hashable {
     var nominal: Double
-    var count: Double
-//    let color: Color
-    let id: UUID
-    let theValue: Double
+    var count: Int
 }

@@ -2,7 +2,7 @@
 //  SettingsView.swift
 //  Kasjer
 //
-//  Created by Woturios on 11/08/2022.
+//  Created by Jan Antonowicz on 11/08/2022.
 //
 
 import SwiftUI
@@ -14,60 +14,60 @@ struct SettingsView: View {
     @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
-        ZStack(alignment: .top) {
-            VStack {
+        VStack(spacing: 30) {
                 Image(systemName: "xmark.app.fill")
                     .padding(.horizontal)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
                     .font(.system(size: 50))
-                    .foregroundColor(.red)
+                    .foregroundColor(.green)
                     .onTapGesture {
                         vm.reset()
                         self.presentationMode.wrappedValue.dismiss()
                     }
-                Spacer()
+                
+                ScrollView() {
+                    VStack(spacing: 20){
+                        VStack(alignment: .leading) {
+                            Text("Minimal value to keep in cashbox:  \(vm.limit.asCurrencyWith2Decimals())")
+                                .font(.headline)
+                            Text("Set new minimal value:")
+                                .minimumScaleFactor(0.5)
+                            TextField("Nowa wartość", text: $textFieldPrice)
+                                .font(.headline)
+                                .padding(.leading)
+                                .frame(height: 50)
+                                .background(
+                                    Color.green
+                                        .opacity(0.5)
+                                )
+                                .cornerRadius(10)
+                                .keyboardType(.numberPad)
+                            Button {
+                                vm.limit = Double(textFieldPrice) ?? 500
+                            } label: {
+                                Text("Save")
+                                    .font(.headline)
+                                    .foregroundColor(Color.black)
+                                    .frame(height: 50)
+                                    .frame(maxWidth: .infinity)
+                                    .background(Color.green)
+                                    .cornerRadius(10)
+                            }
+                        }
+                        VStack {
+                            Label("USER MANUAL", systemImage: "questionmark.circle.fill")
+                                .foregroundStyle(Color.blue)
+                            TipView()
+                        }
+                        .padding()
+                        .background(Color.gray.opacity(0.2))
+                        .cornerRadius(10)
+                    }
+                    .padding()
+                }
             }
             .padding(.top)
 
-            VStack(alignment: .leading, spacing: 12) {
-                HStack {
-                    Text("Obecny limit kasetki:  \(vm.limit.asCurrencyWith2Decimals())")
-                        .font(.headline)
-                }
-                Text("Ustaw nową wartość dla kasetki")
-                    .frame(height: 55)
-                    .font(.title)
-                    .minimumScaleFactor(0.5)
-                ZStack {
-                    RoundedRectangle(cornerRadius: 10)
-                        .frame(height: 60)
-                        .foregroundColor(.red.opacity(0.8))
-                    
-                    TextField("Nowa wartość", text: $textFieldPrice)
-                        .font(.headline)
-                        .padding(.leading)
-                        .frame(height: 55)
-                        .background(Color.black)
-                        .cornerRadius(10)
-                        .padding(3)
-                        .keyboardType(.numberPad)
-                }
-                Button {
-                    vm.limit = Double(textFieldPrice) ?? 500
-                } label: {
-                    Text("Save")
-                        .font(.headline)
-                        .foregroundColor(Color.black)
-                        .frame(height: 55)
-                        .frame(maxWidth: .infinity)
-                        .background(Color.red)
-                        .cornerRadius(10)
-                }
-
-            }
-            .padding()
-            .padding(.top, 100)
-        }
     }
 }
 

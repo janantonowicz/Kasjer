@@ -2,7 +2,7 @@
 //  Double.swift
 //  Kasjer
 //
-//  Created by Woturios on 10/08/2022.
+//  Created by Jan Antonowicz on 10/08/2022.
 //
 
 import Foundation
