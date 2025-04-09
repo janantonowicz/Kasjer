@@ -8,7 +8,9 @@
 import Foundation
 import SwiftUI
 
-struct ItemModel: Identifiable {
+/// Model for current calculation data
+/// Every
+struct RecordModel: Identifiable {
     var nominal: Double
     var count: Double
 //    let color: Color
